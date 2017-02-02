@@ -1,6 +1,9 @@
 package com.omar.packintent;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +16,18 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+
+    private BroadcastReceiver foregroundPushReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive( Context context, Intent intent ) {
+            Bundle extras = intent.getExtras();
+            if( extras != null ) {
+                String message = extras.getString( "message" );
+                updateTextView( message );
+            }
+            abortBroadcast();
+        }
+    };
 
     private static MainActivity _activity;
     public static MainActivity Get() {
@@ -41,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
             if( startExtras != null ) {
                 String message = startExtras.getString("message");
                 Log.i(TAG, "message : " + message);
-                MessageTextView.setText( message );
+                updateTextView( message );
             }
         }
 
@@ -49,6 +64,27 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent( this, MainIntentService.class );
             startService( intent );
         }
+    }
+
+    private void updateTextView( String message ) {
+        Log.i( TAG, "message: " + message );
+        MessageTextView.setText( message );
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        IntentFilter filter = new IntentFilter( "com.omar.packintent.EVENTS_BROADCAST_NOTIFICATION" );
+        filter.setPriority( 1 );
+        registerReceiver( foregroundPushReceiver, filter );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        unregisterReceiver( foregroundPushReceiver );
     }
 
     public boolean checkPlayServices() {
