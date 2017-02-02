@@ -18,12 +18,8 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="OPEN_ACTIVITY_1" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
-        
+
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
             android:exported="true"
@@ -36,7 +32,7 @@
         <service
             android:name="com.omar.packintent.MainListenerService"
             android:exported="false">
-            <intent-filter android:priority="1000">
+            <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
             </intent-filter>
         </service>
@@ -51,5 +47,24 @@
             android:name="com.omar.packintent.MainIntentService"
             android:exported="false">
         </service>
+
+        <!-- Distribute the remote message to the appropriate place -->
+        <service
+            android:name="com.omar.packintent.PushReceiverIntentService"
+            android:exported="false">
+        </service>
+        <receiver
+            android:name="com.omar.packintent.DefaultPushReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter android:priority="0">
+                <action android:name="com.omar.packintent.EVENTS_BROADCAST_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+        <service
+            android:name="com.omar.packintent.DefaultPushIntentService"
+            android:exported="false">
+        </service>
+
     </application>
 </manifest>

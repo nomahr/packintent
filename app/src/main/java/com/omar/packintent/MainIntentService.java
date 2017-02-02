@@ -25,14 +25,16 @@ public class MainIntentService extends IntentService {
 
             Log.i( TAG, "GCM registration token: " + token );
 
+            MainActivity.Get().nativeGCMRegisteredForRemoteNotifications( token );
+
             // subscribe
             GcmPubSub pubSub = GcmPubSub.getInstance( this );
             pubSub.subscribe( token, "/topics/global", null );
 
         } catch ( Exception e ) {
             Log.d( TAG, "GCM failed to complete token refresh" );
-        }
 
-//        sendOrderedBroadcast();
+            MainActivity.Get().nativeGCMFailedToRegisterForRemoteNotifications( "error registering with GCM" );
+        }
     }
 }

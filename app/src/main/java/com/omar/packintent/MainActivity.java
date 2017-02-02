@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -13,19 +14,34 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
-    // Used to load the 'native-lib' library on application startup.
+    private static MainActivity _activity;
+    public static MainActivity Get() {
+        return _activity;
+    }
+
     static {
         System.loadLibrary("native-lib");
     }
+
+    private TextView MessageTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if( savedInstanceState != null ) {
-            if (savedInstanceState.containsKey("message")) {
-                Log.i(TAG, "message = " + savedInstanceState.getString("message"));
+        _activity = this;
+
+        MessageTextView = (TextView)findViewById(R.id.sample_text);
+
+        // check to see if there is a message included in the notification
+        Intent startIntent = getIntent();
+        if( startIntent != null ) {
+            Bundle startExtras = startIntent.getExtras();
+            if( startExtras != null ) {
+                String message = startExtras.getString("message");
+                Log.i(TAG, "message : " + message);
+                MessageTextView.setText( message );
             }
         }
 
@@ -33,11 +49,6 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent( this, MainIntentService.class );
             startService( intent );
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
     }
 
     public boolean checkPlayServices() {
@@ -58,9 +69,8 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     * A native method that is implemented by the 'native-lib' native library,
-     * which is packaged with this application.
-     */
-    public native String stringFromJNI();
+    // native methods
+    public native void nativeGCMRegisteredForRemoteNotifications(String token);
+    public native void nativeGCMFailedToRegisterForRemoteNotifications(String errorMessage);
+    public native void nativeGCMReceivedRemoteNotification(String message);
 }
