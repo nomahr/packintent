@@ -6,10 +6,10 @@ Test project for Google Cloud Messaging
 import requests
 import json
 
-def gcm_send_downstream_message( in_message, in_topic=None ):
-	gcm_url = 'https://android.googleapis.com/gcm/send'
-	server_key = '<ENTER__SERVER__KEY__HERE>'
+gcm_url = 'https://android.googleapis.com/gcm/send'
+server_key = '<ENTER__SERVER__KEY__HERE>'
 
+def gcm_send_downstream_message( in_message, in_topic=None ):
 	topic = in_topic
 	if topic is None:
 		topic = '/topics/global'
